@@ -1,6 +1,7 @@
-package sample;
+package UI;
 
 import DB.DataBase;
+import DB.TransactionList;
 import UI.UIWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -8,16 +9,18 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.PieChart;
+import java.time.LocalDateTime;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
 
 import javafx.scene.control.Label;
 import java.net.URL;
+import java.sql.Date;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
 
-public class Controller implements Initializable{
+public class MainController implements Initializable{
 
     //@FXML
    // private Button happyButton;
@@ -43,11 +46,11 @@ public class Controller implements Initializable{
         try {
 
             DataBase db = new DataBase();
-            float income = db.getTransactionsByPredicate("value > 0").sum();
-            float outcome = db.getTransactionsByPredicate("value < 0").sum();
-            saldoLabel.setText("Saldo: " + new Float(income+outcome).toString());
-            mainPie.setData(UIWrapper.getBalancePieChartData(income, outcome));
-            lastMonthPie.setData(UIWrapper.getBalancePieChartData(523, 543));
+            TransactionList incomes = db.getTransactionsByPredicate("value > 0");
+            TransactionList outcomes = db.getTransactionsByPredicate("value < 0");
+            saldoLabel.setText("Saldo: " + new Float(incomes.sum()+ outcomes.sum()).toString());
+            mainPie.setData(UIWrapper.getBalancePieChartData(incomes.sum(), outcomes.sum()));
+           // lastMonthPie.setData(UIWrapper.getBalancePieChartData(incomes.getTransactionsFromDate(new java.sql.Date(new java.util.Date()))));
             lastWeekPie.setData(UIWrapper.getBalancePieChartData(324, 543));
         }catch (SQLException e){
             e.printStackTrace();

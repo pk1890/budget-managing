@@ -2,19 +2,28 @@
 
 <?import javafx.scene.chart.PieChart?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="600.0" prefWidth="803.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
+<BorderPane prefHeight="600.0" prefWidth="803.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.MainController">
    <left>
       <VBox prefHeight="398.0" prefWidth="151.0" BorderPane.alignment="CENTER">
          <children>
-            <TextArea prefHeight="604.0" prefWidth="151.0" />
+            <Pane prefHeight="89.0" prefWidth="151.0">
+               <children>
+                  <Label layoutX="62.0" layoutY="36.0" text="Main" />
+               </children>
+            </Pane>
+            <Pane prefHeight="88.0" prefWidth="151.0">
+               <children>
+                  <Label layoutX="62.0" layoutY="36.0" text="History" />
+               </children>
+            </Pane>
          </children></VBox>
    </left>
    <right>

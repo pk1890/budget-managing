@@ -108,7 +108,7 @@ public class DataBase {
              Statement stmt = conn.createStatement()) {
 
             sql = "SELECT t.title, t.date, t.value, c.name" +
-                    " FROM Transactions t JOIN Categories c ON t.categoryId = c.id WHERE " + predicate + ";";
+                    " FROM Transactions t JOIN Categories c ON t.categoryId = c.id WHERE " + predicate + " ORDER BY t.date ASC;";
 
              res = stmt.executeQuery(sql);
 
@@ -129,4 +129,7 @@ public class DataBase {
     }
 
 
+    public TransactionList getTransactions() {
+        return this.getTransactionsByPredicate("1==1");
+    }
 }
