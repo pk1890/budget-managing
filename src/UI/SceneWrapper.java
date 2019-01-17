@@ -1,5 +1,6 @@
 package UI;
 
+import DB.SESSION;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -7,14 +8,15 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public class SceneWrapper {
-     private WindowsTypes wt;
-     private Stage primaryStage;
+     private static WindowsTypes wt;
+     private static Stage primaryStage;
 
-     private final Scene mainScene;
-     private final Scene historyScene;
+     private static Scene mainScene;
+     private static Scene historyScene;
+     private static Scene loginScene;
 
 
-     public SceneWrapper(Stage stage) throws IOException {
+     public static void Initialize (Stage stage, Class c) throws IOException {
          wt = WindowsTypes.MAIN;
          primaryStage = stage;
 
@@ -23,28 +25,39 @@ public class SceneWrapper {
          primaryStage.setMinWidth(800);
 
          mainScene = new Scene(
-                 FXMLLoader.load(getClass().getResource("Main.fxml")),
+                 FXMLLoader.load(c.getResource("Main.fxml")),
                  800,
                  600
          );
 
          historyScene = new Scene(
-                 FXMLLoader.load(getClass().getResource("History.fxml")),
+                 FXMLLoader.load(c.getResource("History.fxml")),
                  800,
                  600
          );
+
+         loginScene = new Scene(
+                 FXMLLoader.load(c.getResource("Login.fxml")),
+                 600,
+                 480
+         );
+
      }
 
-     public void setWindow(WindowsTypes w){
+     public static void setWindow(WindowsTypes w){
          wt = w;
-         switch (w){
-             case MAIN:
-                 primaryStage.setScene(mainScene);
-                 break;
-             case HISTORY:
-                 primaryStage.setScene(historyScene);
-                 break;
-
+         if(SESSION.loggedUser != null) {
+             switch (w) {
+                 case MAIN:
+                     primaryStage.setScene(mainScene);
+                     break;
+                 case HISTORY:
+                     primaryStage.setScene(historyScene);
+                     break;
+             }
+         }
+         else{
+                     primaryStage.setScene(loginScene);
          }
      }
 }

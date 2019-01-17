@@ -1,5 +1,6 @@
 package DB;
 
+import com.sun.istack.internal.NotNull;
 import javafx.util.Pair;
 
 import java.util.ArrayList;
@@ -10,18 +11,21 @@ public class Transaction {
     private float value;
     private Date date;
     private String category;
+    private int userId;
 
-    public Transaction(String title, float value, int year, int month, int day, String category){
+    public Transaction(String title, float value, int year, int month, int day, String category, int userId){
         this.title = title;
         this.value = value;
         this.date = new Date(year-1900, month, day);
         this.category = category;
+        this.userId = userId;
     }
 
-    public Transaction(String title, float value, String date, String category){
+    public Transaction(String title, float value, @NotNull String date, @NotNull String category, int userId){
         this.title = title;
         this.value = value;
         this.category = category;
+        this.userId = userId;
 
         String [] details = date.split("-");
         this.date = new Date(
@@ -38,6 +42,7 @@ public class Transaction {
         res.add(new Pair<>("title", title));
         res.add(new Pair<>("date", date.toString()));
         res.add(new Pair<>("value", new Float(value).toString()));
+        res.add(new Pair<>("userId", new Integer(userId).toString()));
         return res;
     }
 
@@ -72,4 +77,6 @@ public class Transaction {
     public void setCategory(String category) {
         this.category = category;
     }
+
+    public int getUserId(){return userId;}
 }

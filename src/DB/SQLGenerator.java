@@ -4,12 +4,13 @@ import javafx.util.Pair;
 
 import java.util.ArrayList;
 import java.util.Dictionary;
+import java.util.List;
 import java.util.StringJoiner;
 
 public final class SQLGenerator {
     private  SQLGenerator(){}
 
-    public static String Insert(String table, ArrayList<Pair<String, String>> data){
+    public static String Insert(String table, List<Pair<String, String>> data){
 
         StringJoiner keyJoiner = new StringJoiner(", ");
         StringJoiner valJoiner = new StringJoiner(", ");

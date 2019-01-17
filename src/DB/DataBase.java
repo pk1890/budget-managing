@@ -1,11 +1,23 @@
 package DB;
 
 
+import UI.SceneWrapper;
+import UI.WindowsTypes;
+import com.sun.org.apache.bcel.internal.generic.Select;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.SortedList;
 import javafx.util.Pair;
 
+import javax.jws.soap.SOAPBinding;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
+import com.google.common.hash.Hashing;
 
 public class DataBase {
     private String url;
@@ -42,15 +54,23 @@ public class DataBase {
                     ");";
             String sqlCreateTrans = "CREATE TABLE IF NOT EXISTS Transactions (\n" +
                     "    id integer NOT NULL CONSTRAINT Transactions_pk PRIMARY KEY AUTOINCREMENT,\n" +
-                    "    title integer NOT NULL,\n" +
+                    "    title text NOT NULL,\n" +
                     "    date date NOT NULL,\n" +
                     "    value decimal(10,2) NOT NULL,\n" +
                     "    categoryId integer NOT NULL,\n" +
-                    "    CONSTRAINT Transactions_Categories FOREIGN KEY (categoryId)\n" +
-                    "    REFERENCES Categories (id)\n" +
+                    "    userId integer NOT NULL \n" +
+//                    "    CONSTRAINT Transactions_Categories FOREIGN KEY (categoryId)\n" +
+//                    "    REFERENCES Categories (id)\n" +
+                   // "    CONSTRAINT Transactions_Users FOREIGN KEY (userId)\n" +
+                    //"    REFERENCES Users (id)\n" +
                     ");";
-
+            String sqlCreateUsers = "CREATE TABLE IF NOT EXISTS Users(" +
+                    "   id integer NOT NULL CONSTRAINT Users_pk PRIMARY KEY AUTOINCREMENT," +
+                    "   login text NOT NULL UNIQUE," +
+                    "   password varchar(255) NOT NULL" +
+                    ");";
             stmt.execute(sqlCreateCat);
+            stmt.execute(sqlCreateUsers);
             stmt.execute(sqlCreateTrans);
             addCategory("other");
 
@@ -85,6 +105,75 @@ public class DataBase {
         }
     }
 
+    public void addUser(String login, String password) throws AlreadyExistsException{
+        try (Connection conn = DriverManager.getConnection(url);
+             Statement stmt = conn.createStatement()) {
+
+            String uniqueQuery = "SELECT 'y' FROM Users where login = '" + login + "'";
+
+           ResultSet res = stmt.executeQuery(uniqueQuery);
+           if (res.next()) throw new AlreadyExistsException("User with this login already exists in DB");
+
+           List data = new ArrayList<Pair<String, String>>();
+           data.add(new Pair<>("login", login));
+
+           SESSION.hashFunc.update(password.getBytes());
+           String hashedPassword = Hashing.sha256().hashString(password, StandardCharsets.UTF_8)
+                   .toString();
+           SESSION.hashFunc.reset();
+           data.add(new Pair<>("password", hashedPassword));
+
+           String sql = SQLGenerator.Insert("Users", data);
+            stmt.execute(sql);
+            System.out.println("Successfuly added user " + login);
+        }catch (SQLException e){
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public List<User> getUsers() {
+        try (Connection conn = DriverManager.getConnection(url);
+             Statement stmt = conn.createStatement()) {
+            String sql = "SELECT id, login FROM Users";
+
+            ResultSet res = stmt.executeQuery(sql);
+
+            List userList = new LinkedList<User>();
+
+            while(res.next()){
+                userList.add(new User(
+                        res.getString("login"),
+                        res.getInt("id")
+                ));
+            }
+            return userList;
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return new LinkedList<User>();
+        }
+    }
+
+    public Boolean logIn(String login, String password){
+        try (Connection conn = DriverManager.getConnection(url);
+             Statement stmt = conn.createStatement()) {
+            String hashed = Hashing.sha256().hashString(password, StandardCharsets.UTF_8).toString();
+            String sql = "SELECT login, id FROM Users WHERE login = '" + login +"' AND password = '" + hashed+"'";
+            ResultSet res = stmt.executeQuery(sql);
+            if(res.next()){
+                SESSION.loggedUser = new User(
+                        res.getString("login"), res.getInt("id")
+                                );
+                return true;
+            }
+            else return false;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+    }
+
     public void addCategory(String categoryName){
         try (Connection conn = DriverManager.getConnection(url);
              Statement stmt = conn.createStatement()) {
@@ -100,6 +189,26 @@ public class DataBase {
         }
     }
 
+    public ObservableList getCategoriesNames() {
+        try (Connection conn = DriverManager.getConnection(url);
+             Statement stmt = conn.createStatement()) {
+
+            ArrayList<String> result = new ArrayList<>();
+            String sql = "SELECT name FROM categories";
+            ResultSet res = stmt.executeQuery(sql);
+
+            while(res.next()){
+                result.add(res.getString("name"));
+            }
+            return FXCollections.observableArrayList(result);
+
+        }catch (SQLException e){
+             System.out.println(e.getMessage());
+             return FXCollections.observableArrayList();
+        }
+
+    }
+
     public TransactionList getTransactionsByPredicate(String predicate){
         String sql = "UNKNOWN";
         TransactionList result = new TransactionList();
@@ -107,7 +216,7 @@ public class DataBase {
         try (Connection conn = DriverManager.getConnection(url);
              Statement stmt = conn.createStatement()) {
 
-            sql = "SELECT t.title, t.date, t.value, c.name" +
+            sql = "SELECT t.title, t.date, t.value, t.userId, c.name" +
                     " FROM Transactions t JOIN Categories c ON t.categoryId = c.id WHERE " + predicate + " ORDER BY t.date ASC;";
 
              res = stmt.executeQuery(sql);
@@ -117,7 +226,8 @@ public class DataBase {
                          res.getString("title"),
                          res.getFloat("value"),
                          res.getString("date"),
-                         res.getString("name"))
+                         res.getString("name"),
+                         res.getInt("userId"))
                  );
              }
             System.out.println("Select with predicate query was executed successfully ");

@@ -1,33 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="600.0" prefWidth="803.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.MainController">
-   <left>
-      <VBox prefHeight="398.0" prefWidth="151.0" BorderPane.alignment="CENTER">
-         <children>
-            <Pane prefHeight="89.0" prefWidth="151.0">
-               <children>
-                  <Label layoutX="62.0" layoutY="36.0" text="Main" />
-               </children>
-            </Pane>
-            <Pane prefHeight="88.0" prefWidth="151.0">
-               <children>
-                  <Label layoutX="62.0" layoutY="36.0" text="History" />
-               </children>
-            </Pane>
-         </children></VBox>
-   </left>
+<BorderPane prefHeight="600.0" prefWidth="803.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.MainController">
    <right>
-      <GridPane prefHeight="600.0" prefWidth="656.0" BorderPane.alignment="CENTER">
+      <GridPane prefHeight="500.0" prefWidth="846.0" BorderPane.alignment="CENTER">
         <columnConstraints>
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -49,7 +35,29 @@
                   <Font name="Lato Light" size="29.0" />
                </font>
             </Label>
+            <Pane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="3">
+               <children>
+                  <Button fx:id="addTransactionButton" layoutX="56.0" layoutY="21.0" mnemonicParsing="false" text="Add transaction" />
+               </children>
+            </Pane>
          </children>
       </GridPane>
    </right>
+   <top>
+      <HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <children>
+            <Pane fx:id="homeButton" prefHeight="200.0" prefWidth="200.0">
+               <children>
+                  <Label layoutX="86.0" layoutY="42.0" text="Home" />
+               </children>
+            </Pane>
+            <Pane fx:id="historyButton" prefHeight="200.0" prefWidth="200.0">
+               <children>
+                  <Label layoutX="86.0" layoutY="42.0" text="History" />
+               </children>
+            </Pane>
+            <Pane prefHeight="200.0" prefWidth="200.0" />
+         </children>
+      </HBox>
+   </top>
 </BorderPane>
