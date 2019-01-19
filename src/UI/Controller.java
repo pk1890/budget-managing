@@ -1,16 +1,9 @@
 package UI;
 
 import DB.DataBase;
-import DB.TransactionList;
-import Util.Interval;
 import javafx.event.EventHandler;
-import javafx.fxml.Initializable;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
-
-import java.net.URL;
-import java.sql.SQLException;
-import java.util.ResourceBundle;
 
 public abstract class Controller{
     protected DataBase db;

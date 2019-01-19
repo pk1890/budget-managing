@@ -2,13 +2,9 @@ package UI;
 
 import DB.*;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.security.NoSuchAlgorithmException;
-import java.sql.*;
 
 
 public class Main extends Application {
@@ -31,7 +27,7 @@ public class Main extends Application {
 
     public static void main(String[] args) throws NoSuchAlgorithmException {
 
-        TransactionList res = new TransactionList();
+        SortedTransactionList res = new SortedTransactionList();
         SESSION.init();
 //        try {
 //            db = new DataBase();

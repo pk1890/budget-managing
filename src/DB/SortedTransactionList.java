@@ -1,27 +1,22 @@
 package DB;
 
 import Util.Interval;
-import com.sun.org.glassfish.external.statistics.Statistic;
-import javafx.beans.binding.ListExpression;
-import javafx.collections.ObservableList;
-import javafx.collections.transformation.SortedList;
 import javafx.scene.chart.XYChart;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Iterator;
 import java.sql.Date;
 import java.util.List;
 
-public class TransactionList{
+public class SortedTransactionList implements Plottable {
     public List<Transaction> list;
 
 
-    public TransactionList(List<Transaction> list){
+    public SortedTransactionList(List<Transaction> list){
         this.list = list;
     }
 
-    public TransactionList(){
+    public SortedTransactionList(){
         list = new ArrayList<Transaction>();
     }
 
@@ -42,30 +37,31 @@ public class TransactionList{
         return list.size() != 0 ? sum()/list.size() : 0;
     }
 
-    public TransactionList getTransactionsToDate(Date date){
+    public SortedTransactionList getTransactionsToDate(Date date){
         int index = 0;
         while(index < this.list.size() && this.list.get(index).getDate().compareTo(date) <= 0 ){
             index++;
         }
-        TransactionList resultList = new TransactionList(this.list.subList(0, index));
+        SortedTransactionList resultList = new SortedTransactionList(this.list.subList(0, index));
         System.out.println(index + " " + date.getYear() + " " +  date.getMonth() + " " + date.getDay());
         return resultList;
     }
 
-    public TransactionList getTransactionsFromDate(Date date){
+    public SortedTransactionList getTransactionsFromDate(Date date){
         int index = 0;
         while(index < this.list.size() && this.list.get(index).getDate().compareTo(date) < 0 ){
             index++;
         }
-        TransactionList resultList = new TransactionList(this.list.subList(index, this.list.size()));
+        SortedTransactionList resultList = new SortedTransactionList(this.list.subList(index, this.list.size()));
 
         return resultList;
     }
 
-    public TransactionList getTransactionsBetweenDates(Date start, Date end){
+    public SortedTransactionList getTransactionsBetweenDates(Date start, Date end){
         return this.getTransactionsFromDate(start).getTransactionsToDate(end);
     }
 
+    @Override
     public XYChart.Series getPlotData(Interval interval) {
         XYChart.Series result = new XYChart.Series();
         java.util.Date date =  new java.util.Date();

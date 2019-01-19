@@ -13,7 +13,7 @@ public class Transaction {
     private String category;
     private int userId;
 
-    public Transaction(String title, float value, int year, int month, int day, String category, int userId){
+    public Transaction(String title, float value, int year, int month, int day, @ NotNull String category, int userId){
         this.title = title;
         this.value = value;
         this.date = new Date(year-1900, month, day);

@@ -1,22 +1,16 @@
 package DB;
 
 
-import UI.SceneWrapper;
-import UI.WindowsTypes;
-import com.sun.org.apache.bcel.internal.generic.Select;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.SortedList;
 import javafx.util.Pair;
 
-import javax.jws.soap.SOAPBinding;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
+
 import com.google.common.hash.Hashing;
 
 public class DataBase {
@@ -209,9 +203,9 @@ public class DataBase {
 
     }
 
-    public TransactionList getTransactionsByPredicate(String predicate){
+    public SortedTransactionList getTransactionsByPredicate(String predicate){
         String sql = "UNKNOWN";
-        TransactionList result = new TransactionList();
+        SortedTransactionList result = new SortedTransactionList();
         ResultSet res;
         try (Connection conn = DriverManager.getConnection(url);
              Statement stmt = conn.createStatement()) {
@@ -239,7 +233,7 @@ public class DataBase {
     }
 
 
-    public TransactionList getTransactions() {
+    public SortedTransactionList getTransactions() {
         return this.getTransactionsByPredicate("1==1");
     }
 }
