@@ -1,7 +1,10 @@
 package UI;
 
+import DB.AlreadyExistsException;
 import DB.SESSION;
 import DB.User;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -23,16 +26,85 @@ public class LoginController implements Initializable, IOnLoad{
     @FXML
     VBox usersList;
 
+    @FXML
+    Button registerButton;
 
+
+    @Override
+    public void onLoad(){
+        for (User u: SESSION.db.getUsers()
+                ) {
+            usersList.getChildren().add(loginPane(u));
+
+        }
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        for (User u: SESSION.db.getUsers()
-             ) {
-            usersList.getChildren().add(loginPane(u));
 
-        }
+
+        registerButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                // Stwórz popup'a
+                Dialog<Pair<String, String>> dialog = new Dialog<>();
+                dialog.setTitle("Login Dialog");
+                dialog.setHeaderText("Enter login and password");
+
+                // Dodaj przyciski
+                ButtonType loginButtonType = new ButtonType("Login", ButtonBar.ButtonData.OK_DONE);
+                dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
+
+                // Create the username and password labels and fields.
+                GridPane grid = new GridPane();
+                grid.setHgap(10);
+                grid.setVgap(10);
+                grid.setPadding(new Insets(20, 150, 10, 10));
+
+                TextField login = new TextField();
+                login.setPromptText("Login");
+
+                PasswordField password = new PasswordField();
+                password.setPromptText("Password");
+
+
+                grid.add(new Label("Login:"), 0, 1);
+                grid.add(login, 1, 1);
+
+                grid.add(new Label("Password:"), 0, 2);
+                grid.add(password, 1, 2);
+
+
+                dialog.getDialogPane().setContent(grid);
+
+                dialog.setResultConverter(dialogButton -> {
+                    if (dialogButton == loginButtonType) {
+                        return new Pair<>(login.getText(), password.getText());
+                    }
+                    return null;
+                });
+
+
+                Optional<Pair<String, String>> result = dialog.showAndWait();
+
+                result.ifPresent(usernamePassword -> {
+                    try {
+                        SESSION.db.addUser(login.getText(), password.getText());
+                    } catch (AlreadyExistsException e) {
+                        Dialog<Pair<String, String>> alert = new Dialog<>();
+                        alert.setTitle("Error");
+                        alert.setHeaderText("Login already in use");
+
+                        // Dodaj przyciski
+                        alert.getDialogPane().getButtonTypes().addAll(ButtonType.OK);
+                        alert.show();
+
+                    }
+                });
+            }
+        });
+
     }
 
     BorderPane loginPane (User user){
@@ -102,6 +174,15 @@ public class LoginController implements Initializable, IOnLoad{
         result.ifPresent(usernamePassword -> {
             if(SESSION.db.logIn(usernamePassword.getKey(), usernamePassword.getValue())){
                 SceneWrapper.setWindow(WindowsTypes.MAIN);
+            }
+            else{
+                Dialog<Pair<String, String>> alert = new Dialog<>();
+                alert.setTitle("Error");
+                alert.setHeaderText("Wrong password");
+
+                // Dodaj przyciski
+                alert.getDialogPane().getButtonTypes().addAll(ButtonType.OK);
+                alert.show();
             }
         });
     }

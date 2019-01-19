@@ -1,13 +1,12 @@
 package DB;
 
 import Util.Interval;
+import javafx.collections.ObservableList;
 import javafx.scene.chart.XYChart;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.*;
 import java.sql.Date;
-import java.util.List;
 
 public class SortedTransactionList implements Plottable {
     public List<Transaction> list;
@@ -30,6 +29,16 @@ public class SortedTransactionList implements Plottable {
 
         for (Transaction tr:list) {
             sum += tr.getValue();
+        }
+        sum = Math.round(sum*100.0)/100.0;
+        return sum;
+    }
+
+    public double absSum(){
+        double sum = 0;
+
+        for (Transaction tr:list) {
+            sum += Math.abs(tr.getValue());
         }
         sum = Math.round(sum*100.0)/100.0;
         return sum;
@@ -89,6 +98,17 @@ public class SortedTransactionList implements Plottable {
 
         }
         return result;
+    }
+
+    public Map<String, Double> getCategoriesTrading(){
+        Map<String, Double> res = new HashMap<>();
+        List<String> categories = SESSION.db.getCategoriesNames();
+        for (String name : categories
+             ) {
+
+            res.put(name, SESSION.db.getCurrentUserTransactionsByPredicate("categoryId = " + SESSION.db.getCategoryId(name)).absSum());
+        }
+        return res;
     }
 
 

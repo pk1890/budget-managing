@@ -75,15 +75,25 @@ public class DataBase {
         }
     }
 
-    public void addTransaction(Transaction tr){
+    public String getCategoryId(String name){
         try (Connection conn = DriverManager.getConnection(url);
              Statement stmt = conn.createStatement()) {
 
-            String askCatID = "SELECT id FROM Categories WHERE name = '" + tr.getCategory() + "';";
+            String askCatID = "SELECT id FROM Categories WHERE name = '" + name + "';";
 
             ResultSet rs = stmt.executeQuery(askCatID);
 
             String catID = rs.getString("id");
+            return catID;
+        } catch (SQLException e) {
+            return "1";
+        }
+    }
+
+    public void addTransaction(Transaction tr){
+        try (Connection conn = DriverManager.getConnection(url);
+             Statement stmt = conn.createStatement()) {
+            String catID = getCategoryId(tr.getCategory());
 
             ArrayList data = tr.getTransactionInternalData();
             data.add(new Pair<>("categoryId", catID));
@@ -183,7 +193,7 @@ public class DataBase {
         }
     }
 
-    public ObservableList getCategoriesNames() {
+    public List<String> getCategoriesNames() {
         try (Connection conn = DriverManager.getConnection(url);
              Statement stmt = conn.createStatement()) {
 
@@ -194,12 +204,18 @@ public class DataBase {
             while(res.next()){
                 result.add(res.getString("name"));
             }
-            return FXCollections.observableArrayList(result);
+            return result;
 
         }catch (SQLException e){
-             System.out.println(e.getMessage());
-             return FXCollections.observableArrayList();
+            System.out.println(e.getMessage());
+            return new ArrayList();
         }
+
+    }
+
+
+    public ObservableList getCategoriesNamesObservableList() {
+       return FXCollections.observableArrayList(getCategoriesNames());
 
     }
 

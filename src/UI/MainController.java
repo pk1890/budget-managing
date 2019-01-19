@@ -45,6 +45,9 @@ public class MainController extends Controller implements Initializable{
 
     @FXML
     private Button addCategoryButton;
+
+    @FXML
+    private PieChart categoriesChart;
     @Override
     public void onLoad(){
         updateCharts();
@@ -96,7 +99,7 @@ public class MainController extends Controller implements Initializable{
                         ComboBox category = new ComboBox();
                         category.setPromptText("Set category");
 
-                        category.setItems(SESSION.db.getCategoriesNames());
+                        category.setItems(SESSION.db.getCategoriesNamesObservableList());
 
                         PasswordField password = new PasswordField();
                         password.setPromptText("Password");
@@ -222,6 +225,8 @@ public class MainController extends Controller implements Initializable{
         mainPie.setData(UIWrapper.getBalancePieChartData(MonthIncomes.sum(), MonthOutcomes.sum()));
         // lastMonthPie.setData(UIWrapper.getBalancePieChartData(incomes.getTransactionsFromDate(new java.sql.Date(new java.util.Date()))));
         lastYearPie.setData(UIWrapper.getBalancePieChartData(YearIncomes.sum(), YearOutcomes.sum()));
+        categoriesChart.setData(UIWrapper.getCategoriesPieChartData(SESSION.db.getCurrentUserTransactions().getCategoriesTrading()));
+
     }
 
 
