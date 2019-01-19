@@ -236,4 +236,15 @@ public class DataBase {
     public SortedTransactionList getTransactions() {
         return this.getTransactionsByPredicate("1==1");
     }
+
+    public SortedTransactionList getCurrentUserTransactionsByPredicate(String predicate) {
+        if(SESSION.loggedUser != null)
+            return this.getTransactionsByPredicate("userId = " + SESSION.loggedUser.id + " AND " + predicate);
+
+        return new SortedTransactionList();
+    }
+
+    public SortedTransactionList getCurrentUserTransactions() {
+        return this.getCurrentUserTransactionsByPredicate("1==1");
+    }
 }

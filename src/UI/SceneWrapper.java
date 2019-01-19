@@ -1,6 +1,7 @@
 package UI;
 
 import DB.SESSION;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -16,7 +17,16 @@ public class SceneWrapper {
      private static Scene loginScene;
 
 
-     public static void Initialize (Stage stage, Class c) throws IOException {
+     private static FXMLLoader mainLoader;
+     private static FXMLLoader historyLoader;
+     private static FXMLLoader loginLoader;
+
+     private static IOnLoad mainController;
+     private static IOnLoad historyController;
+     private static IOnLoad loginController;
+
+
+    public static void Initialize (Stage stage, Class c) throws IOException {
          wt = WindowsTypes.MAIN;
          primaryStage = stage;
 
@@ -24,25 +34,34 @@ public class SceneWrapper {
          primaryStage.setMinHeight(600);
          primaryStage.setMinWidth(800);
 
+         mainLoader = new FXMLLoader(c.getResource("Main.fxml"));
+         historyLoader = new FXMLLoader(c.getResource("History.fxml"));
+         loginLoader = new FXMLLoader(c.getResource("Login.fxml"));
+
+
          mainScene = new Scene(
-                 FXMLLoader.load(c.getResource("Main.fxml")),
+                 mainLoader.load(),
                  800,
                  600
          );
 
          historyScene = new Scene(
-                 FXMLLoader.load(c.getResource("History.fxml")),
+                 historyLoader.load(),
                  800,
                  600
          );
 
          loginScene = new Scene(
-                 FXMLLoader.load(c.getResource("Login.fxml")),
+                 loginLoader.load(),
                  600,
                  480
          );
 
-     }
+        mainController =  mainLoader.getController();
+        historyController = historyLoader.getController();
+        loginController = loginLoader.getController();
+
+    }
 
      public static void setWindow(WindowsTypes w){
          wt = w;
@@ -50,16 +69,20 @@ public class SceneWrapper {
              switch (w) {
                  case MAIN:
                      primaryStage.setScene(mainScene);
+                     mainController.onLoad();
                      break;
                  case HISTORY:
                      primaryStage.setScene(historyScene);
+                     historyController.onLoad();
                      break;
              }
          }
          else{
                      primaryStage.setScene(loginScene);
+                     loginController.onLoad();
          }
      }
+
 }
 
 

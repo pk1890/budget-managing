@@ -18,10 +18,12 @@ import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-public class LoginController implements Initializable {
+public class LoginController implements Initializable, IOnLoad{
 
     @FXML
     VBox usersList;
+
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {

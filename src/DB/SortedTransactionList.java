@@ -3,6 +3,7 @@ package DB;
 import Util.Interval;
 import javafx.scene.chart.XYChart;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.sql.Date;
@@ -24,26 +25,30 @@ public class SortedTransactionList implements Plottable {
         list.add(tr);
     }
 
-    public float sum(){
-        float sum = 0;
+    public double sum(){
+        double sum = 0;
 
         for (Transaction tr:list) {
             sum += tr.getValue();
         }
+        sum = Math.round(sum*100.0)/100.0;
         return sum;
     }
 
-    public float average(){
+    public double average(){
         return list.size() != 0 ? sum()/list.size() : 0;
     }
 
     public SortedTransactionList getTransactionsToDate(Date date){
         int index = 0;
+        //date.setYear(date.getYear()-1900);
         while(index < this.list.size() && this.list.get(index).getDate().compareTo(date) <= 0 ){
             index++;
         }
         SortedTransactionList resultList = new SortedTransactionList(this.list.subList(0, index));
-        System.out.println(index + " " + date.getYear() + " " +  date.getMonth() + " " + date.getDay());
+        System.out.println("indeks: " + index + " rok: " + date.getYear() + " mies: " +  date.getMonth() + " dzien: " + date.getDay() + "data text: "+ date.toString());
+//        date = this.list.get(index).getDate();
+        System.out.println("DATA W INDEKSIE: " + index + " rok: " + date.getYear() + " mies: " +  date.getMonth() + " dzien: " + date.getDay() + "data text: "+ date.toString());
         return resultList;
     }
 
@@ -64,21 +69,29 @@ public class SortedTransactionList implements Plottable {
     @Override
     public XYChart.Series getPlotData(Interval interval) {
         XYChart.Series result = new XYChart.Series();
-        java.util.Date date =  new java.util.Date();
-        System.out.println(date);
+        LocalDate now = LocalDate.now();
 
         switch (interval){
             default:
-                for(int i = 1; i <= Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH); i++){
-                  //  result.getData().add(new XYChart.Data(i, this.getTransactionsToDate(new Date(
-                    //        date
-                   // )).sum()
-                  //  ));
+                for(int i = 1; i <= now.getDayOfMonth(); i++){
+
+                    Date date = new Date(
+                            now.getYear(),
+                            now.getMonthValue(),
+                            i
+                    );
+
+//                    System.out.println("Data: " + date.toString() + ",    Saldo: " + this.getTransactionsFromDate(date).sum());
+
+
+                    result.getData().add(new XYChart.Data(i, getTransactionsToDate(date).sum()));
                 }
 
         }
         return result;
     }
+
+
 
 
 }

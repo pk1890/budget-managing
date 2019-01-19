@@ -8,7 +8,7 @@ public final class UIWrapper {
     private UIWrapper(){
     }
 
-    public static ObservableList<PieChart.Data> getBalancePieChartData(float income, float expense){
+    public static ObservableList<PieChart.Data> getBalancePieChartData(double income, double expense){
         ObservableList<PieChart.Data> data = FXCollections.observableArrayList();
         data.add(new PieChart.Data("Przychody", income));
         data.add(new PieChart.Data("Wydatki", expense));

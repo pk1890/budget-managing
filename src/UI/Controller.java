@@ -5,7 +5,7 @@ import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 
-public abstract class Controller{
+public abstract class Controller implements IOnLoad{
     protected DataBase db;
     protected Pane homeButton;
     protected Pane historyButton;
