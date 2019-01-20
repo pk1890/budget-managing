@@ -133,6 +133,7 @@ public class MainController extends Controller implements Initializable{
                         result.ifPresent(usernamePassword -> {
 
                             SESSION.db.addTransaction(new Transaction(
+                                        0,
                                         title.getText(),
                                         Float.parseFloat(value.getText()),
                                         date.getValue().getYear(),

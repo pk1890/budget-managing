@@ -55,9 +55,9 @@ public class SortedTransactionList implements Plottable {
             index++;
         }
         SortedTransactionList resultList = new SortedTransactionList(this.list.subList(0, index));
-        System.out.println("indeks: " + index + " rok: " + date.getYear() + " mies: " +  date.getMonth() + " dzien: " + date.getDay() + "data text: "+ date.toString());
+//        System.out.println("indeks: " + index + " rok: " + date.getYear() + " mies: " +  date.getMonth() + " dzien: " + date.getDay() + "data text: "+ date.toString());
 //        date = this.list.get(index).getDate();
-        System.out.println("DATA W INDEKSIE: " + index + " rok: " + date.getYear() + " mies: " +  date.getMonth() + " dzien: " + date.getDay() + "data text: "+ date.toString());
+//        System.out.println("DATA W INDEKSIE: " + index + " rok: " + date.getYear() + " mies: " +  date.getMonth() + " dzien: " + date.getDay() + "data text: "+ date.toString());
         return resultList;
     }
 

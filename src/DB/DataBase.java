@@ -226,13 +226,14 @@ public class DataBase {
         try (Connection conn = DriverManager.getConnection(url);
              Statement stmt = conn.createStatement()) {
 
-            sql = "SELECT t.title, t.date, t.value, t.userId, c.name" +
+            sql = "SELECT t.id, t.title, t.date, t.value, t.userId, c.name" +
                     " FROM Transactions t JOIN Categories c ON t.categoryId = c.id WHERE " + predicate + " ORDER BY t.date ASC;";
 
              res = stmt.executeQuery(sql);
 
              while(res.next()){
                  result.add(new Transaction(
+                         res.getInt("id"),
                          res.getString("title"),
                          res.getFloat("value"),
                          res.getString("date"),
@@ -248,6 +249,19 @@ public class DataBase {
         return result;
     }
 
+
+    public void deleteTransaction(int transactionId){
+        try (Connection conn = DriverManager.getConnection(url);
+             Statement stmt = conn.createStatement()) {
+
+            String sql = "DELETE FROM Transactions WHERE id = " + new Integer(transactionId).toString();
+
+            stmt.execute(sql);
+            System.out.println("Succesfuly deleted transaction no " + transactionId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     public SortedTransactionList getTransactions() {
         return this.getTransactionsByPredicate("1==1");

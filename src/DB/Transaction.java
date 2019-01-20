@@ -7,13 +7,15 @@ import java.util.ArrayList;
 import java.sql.Date;
 
 public class Transaction {
+    private  int id;
     private String title;
     private float value;
     private Date date;
     private String category;
     private int userId;
 
-    public Transaction(String title, float value, int year, int month, int day, @ NotNull String category, int userId){
+    public Transaction(int id, String title, float value, int year, int month, int day, @ NotNull String category, int userId){
+        this.id = id;
         this.title = title;
         this.value = value;
         this.date = new Date(year-1900, month, day);
@@ -21,7 +23,8 @@ public class Transaction {
         this.userId = userId;
     }
 
-    public Transaction(String title, float value, @NotNull String date, @NotNull String category, int userId){
+    public Transaction(int id, String title, float value, @NotNull String date, @NotNull String category, int userId){
+        this.id = id;
         this.title = title;
         this.value = value;
         this.category = category;
@@ -39,12 +42,15 @@ public class Transaction {
 
     public ArrayList<Pair<String, String>> getTransactionInternalData(){
         ArrayList res = new ArrayList<Pair<String, String>>();
+        //res.add(new Pair<>("id", new Integer(id).toString()));
         res.add(new Pair<>("title", title));
         res.add(new Pair<>("date", date.toString()));
         res.add(new Pair<>("value", new Float(value).toString()));
         res.add(new Pair<>("userId", new Integer(userId).toString()));
         return res;
     }
+
+    public int getId(){return  id;}
 
     public String getTitle() {
         return title;
