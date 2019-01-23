@@ -108,7 +108,7 @@ public class DataBase {
             System.out.println(sql);
             stmt.executeQuery(sql);
 
-            System.out.println("The database was initialized successfully");
+            System.out.println("Transation was added successfully");
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
