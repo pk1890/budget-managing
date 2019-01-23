@@ -121,10 +121,10 @@ public class DataBase {
            List data = new ArrayList<Pair<String, String>>();
            data.add(new Pair<>("login", login));
 
-           SESSION.hashFunc.update(password.getBytes());
+           Session.getHashFunc().update(password.getBytes());
            String hashedPassword = Hashing.sha256().hashString(password, StandardCharsets.UTF_8)
                    .toString();
-           SESSION.hashFunc.reset();
+           Session.getHashFunc().reset();
            data.add(new Pair<>("password", hashedPassword));
 
            String sql = SQLGenerator.Insert("Users", data);
@@ -142,7 +142,7 @@ public class DataBase {
 
             ResultSet res = stmt.executeQuery(sql);
 
-            List userList = new LinkedList<User>();
+            List<User> userList = new LinkedList<User>();
 
             while(res.next()){
                 userList.add(new User(
@@ -165,9 +165,9 @@ public class DataBase {
             String sql = "SELECT login, id FROM Users WHERE login = '" + login +"' AND password = '" + hashed+"'";
             ResultSet res = stmt.executeQuery(sql);
             if(res.next()){
-                SESSION.loggedUser = new User(
+                Session.setLoggedUser(new User(
                         res.getString("login"), res.getInt("id")
-                                );
+                                ));
                 return true;
             }
             else return false;
@@ -208,7 +208,7 @@ public class DataBase {
 
         }catch (SQLException e){
             System.out.println(e.getMessage());
-            return new ArrayList();
+            return new ArrayList<>();
         }
 
     }
@@ -268,8 +268,8 @@ public class DataBase {
     }
 
     public SortedTransactionList getCurrentUserTransactionsByPredicate(String predicate) {
-        if(SESSION.loggedUser != null)
-            return this.getTransactionsByPredicate("userId = " + SESSION.loggedUser.id + " AND " + predicate);
+        if(Session.getLoggedUser() != null)
+            return this.getTransactionsByPredicate("userId = " + Session.getLoggedUser().id + " AND " + predicate);
 
         return new SortedTransactionList();
     }

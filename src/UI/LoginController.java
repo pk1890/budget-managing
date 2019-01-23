@@ -1,22 +1,18 @@
 package UI;
 
 import DB.AlreadyExistsException;
-import DB.SESSION;
+import DB.Session;
 import DB.User;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.util.Pair;
 
-import javax.jws.soap.SOAPBinding;
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -24,15 +20,16 @@ import java.util.ResourceBundle;
 public class LoginController implements Initializable, IOnLoad{
 
     @FXML
-    VBox usersList;
+    private VBox usersList;
 
     @FXML
-    Button registerButton;
+    private Button registerButton;
 
 
     @Override
     public void onLoad(){
-        for (User u: SESSION.db.getUsers()
+        usersList.getChildren().clear();
+        for (User u: Session.getDb().getUsers()
                 ) {
             usersList.getChildren().add(loginPane(u));
 
@@ -44,65 +41,63 @@ public class LoginController implements Initializable, IOnLoad{
 
 
 
-        registerButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                // Stwórz popup'a
-                Dialog<Pair<String, String>> dialog = new Dialog<>();
-                dialog.setTitle("Login Dialog");
-                dialog.setHeaderText("Enter login and password");
+        registerButton.setOnMouseClicked(event -> {
+            // Stwórz popup'a
+            Dialog<Pair<String, String>> dialog = new Dialog<>();
+            dialog.setTitle("Login Dialog");
+            dialog.setHeaderText("Enter login and password");
 
-                // Dodaj przyciski
-                ButtonType loginButtonType = new ButtonType("Login", ButtonBar.ButtonData.OK_DONE);
-                dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
+            // Dodaj przyciski
+            ButtonType loginButtonType = new ButtonType("Login", ButtonBar.ButtonData.OK_DONE);
+            dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
 
-                // Create the username and password labels and fields.
-                GridPane grid = new GridPane();
-                grid.setHgap(10);
-                grid.setVgap(10);
-                grid.setPadding(new Insets(20, 150, 10, 10));
+            // Create the username and password labels and fields.
+            GridPane grid = new GridPane();
+            grid.setHgap(10);
+            grid.setVgap(10);
+            grid.setPadding(new Insets(20, 150, 10, 10));
 
-                TextField login = new TextField();
-                login.setPromptText("Login");
+            TextField login = new TextField();
+            login.setPromptText("Login");
 
-                PasswordField password = new PasswordField();
-                password.setPromptText("Password");
+            PasswordField password = new PasswordField();
+            password.setPromptText("Password");
 
 
-                grid.add(new Label("Login:"), 0, 1);
-                grid.add(login, 1, 1);
+            grid.add(new Label("Login:"), 0, 1);
+            grid.add(login, 1, 1);
 
-                grid.add(new Label("Password:"), 0, 2);
-                grid.add(password, 1, 2);
-
-
-                dialog.getDialogPane().setContent(grid);
-
-                dialog.setResultConverter(dialogButton -> {
-                    if (dialogButton == loginButtonType) {
-                        return new Pair<>(login.getText(), password.getText());
-                    }
-                    return null;
-                });
+            grid.add(new Label("Password:"), 0, 2);
+            grid.add(password, 1, 2);
 
 
-                Optional<Pair<String, String>> result = dialog.showAndWait();
+            dialog.getDialogPane().setContent(grid);
 
-                result.ifPresent(usernamePassword -> {
-                    try {
-                        SESSION.db.addUser(login.getText(), password.getText());
-                    } catch (AlreadyExistsException e) {
-                        Dialog<Pair<String, String>> alert = new Dialog<>();
-                        alert.setTitle("Error");
-                        alert.setHeaderText("Login already in use");
+            dialog.setResultConverter(dialogButton -> {
+                if (dialogButton == loginButtonType) {
+                    return new Pair<>(login.getText(), password.getText());
+                }
+                return null;
+            });
 
-                        // Dodaj przyciski
-                        alert.getDialogPane().getButtonTypes().addAll(ButtonType.OK);
-                        alert.show();
 
-                    }
-                });
-            }
+            Optional<Pair<String, String>> result = dialog.showAndWait();
+
+            result.ifPresent(usernamePassword -> {
+                try {
+                    Session.getDb().addUser(login.getText(), password.getText());
+                } catch (AlreadyExistsException e) {
+                    Dialog<Pair<String, String>> alert = new Dialog<>();
+                    alert.setTitle("Error");
+                    alert.setHeaderText("Login already in use");
+
+                    // Dodaj przyciski
+                    alert.getDialogPane().getButtonTypes().addAll(ButtonType.OK);
+                    alert.show();
+
+                }
+                onLoad();
+            });
         });
 
     }
@@ -119,25 +114,22 @@ public class LoginController implements Initializable, IOnLoad{
 
         bp.setMargin(lab, new Insets(10,0,10,0));
         bp.setOnMouseClicked(
-                new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent event) {
-                        if(event.getSource() instanceof BorderPane){
-                            BorderPane elem = (BorderPane)event.getSource();
-                            if(elem.getCenter() instanceof Label)
-                                writePassword(
-                                        ((Label)elem.getCenter()).getText()
-                                );
-                        }
-
-                    }
+            event -> {
+                if(event.getSource() instanceof BorderPane){
+                    BorderPane elem = (BorderPane)event.getSource();
+                    if(elem.getCenter() instanceof Label)
+                        writePassword(
+                            ((Label)elem.getCenter()).getText()
+                        );
                 }
+
+            }
         );
 
         return bp;
     }
 
-    void writePassword(String login){
+    private void writePassword(String login){
         // Stwórz popup'a
         Dialog<Pair<String, String>> dialog = new Dialog<>();
         dialog.setTitle("Login Dialog");
@@ -172,7 +164,7 @@ public class LoginController implements Initializable, IOnLoad{
         Optional<Pair<String, String>> result = dialog.showAndWait();
 
         result.ifPresent(usernamePassword -> {
-            if(SESSION.db.logIn(usernamePassword.getKey(), usernamePassword.getValue())){
+            if(Session.getDb().logIn(usernamePassword.getKey(), usernamePassword.getValue())){
                 SceneWrapper.setWindow(WindowsTypes.MAIN);
             }
             else{

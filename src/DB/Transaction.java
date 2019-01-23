@@ -41,12 +41,12 @@ public class Transaction {
 
 
     public ArrayList<Pair<String, String>> getTransactionInternalData(){
-        ArrayList res = new ArrayList<Pair<String, String>>();
+        ArrayList <Pair<String, String>> res = new ArrayList<>();
         //res.add(new Pair<>("id", new Integer(id).toString()));
         res.add(new Pair<>("title", title));
         res.add(new Pair<>("date", date.toString()));
-        res.add(new Pair<>("value", new Float(value).toString()));
-        res.add(new Pair<>("userId", new Integer(userId).toString()));
+        res.add(new Pair<>("value", Float.toString(value)));
+        res.add(new Pair<>("userId", Integer.toString(userId)));
         return res;
     }
 

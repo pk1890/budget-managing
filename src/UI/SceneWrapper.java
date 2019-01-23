@@ -1,7 +1,6 @@
 package UI;
 
-import DB.SESSION;
-import javafx.fxml.FXML;
+import DB.Session;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -17,16 +16,12 @@ public class SceneWrapper {
      private static Scene loginScene;
 
 
-     private static FXMLLoader mainLoader;
-     private static FXMLLoader historyLoader;
-     private static FXMLLoader loginLoader;
-
-     private static IOnLoad mainController;
+    private static IOnLoad mainController;
      private static IOnLoad historyController;
      private static IOnLoad loginController;
 
 
-    public static void Initialize (Stage stage, Class c) throws IOException {
+    static void Initialize(Stage stage, Class c) throws IOException {
          wt = WindowsTypes.MAIN;
          primaryStage = stage;
 
@@ -34,9 +29,9 @@ public class SceneWrapper {
          primaryStage.setMinHeight(600);
          primaryStage.setMinWidth(800);
 
-         mainLoader = new FXMLLoader(c.getResource("Main.fxml"));
-         historyLoader = new FXMLLoader(c.getResource("History.fxml"));
-         loginLoader = new FXMLLoader(c.getResource("Login.fxml"));
+        FXMLLoader mainLoader = new FXMLLoader(c.getResource("Main.fxml"));
+        FXMLLoader historyLoader = new FXMLLoader(c.getResource("History.fxml"));
+        FXMLLoader loginLoader = new FXMLLoader(c.getResource("Login.fxml"));
 
 
          mainScene = new Scene(
@@ -63,9 +58,9 @@ public class SceneWrapper {
 
     }
 
-     public static void setWindow(WindowsTypes w){
+     static void setWindow(WindowsTypes w){
          wt = w;
-         if(SESSION.loggedUser != null) {
+         if(Session.getLoggedUser() != null) {
              switch (w) {
                  case MAIN:
                      primaryStage.setScene(mainScene);

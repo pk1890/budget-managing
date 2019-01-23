@@ -1,25 +1,17 @@
 package UI;
 
-import DB.SESSION;
-import DB.SortedTransactionList;
+import DB.*;
 
-import DB.Transaction;
-import DB.User;
-import Util.Interval;
+
+import javafx.collections.FXCollections;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.chart.AreaChart;
-import javafx.scene.chart.Axis;
 import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.StackedAreaChart;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -29,9 +21,7 @@ import javafx.util.Pair;
 //import java.beans.EventHandler;
 import java.net.URL;
 import java.sql.Date;
-import java.util.Calendar;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class HistoryController extends Controller implements Initializable {
 
@@ -50,33 +40,92 @@ public class HistoryController extends Controller implements Initializable {
     @FXML
     NumberAxis xAxis;
 
+    @FXML
+    ComboBox historySortingComboBox;
+
+    @FXML
+    ComboBox chartRangeComboBox;
+
+    @FXML
+    Button updateButton;
+
     @Override
     public void onLoad(){
         initChart();
         setHistory();
     }
 
+    private Interval historyChartInterval;
+
+    private ComparisonMethod historyComparisonMethod;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-            super.init(homeButton, historyButton);
-//            SortedTransactionList incomes = SESSION.db.getTransactionsByPredicate("value > 0");
-//            SortedTransactionList outcomes = SESSION.db.getTransactionsByPredicate("value < 0");
-                initChart();
+        initButtons();
 
+        chartRangeComboBox.getSelectionModel().selectFirst();
+        historySortingComboBox.getSelectionModel().selectFirst();
+
+        historyChartInterval = Interval.MONTH;
+        historyComparisonMethod = ComparisonMethod.DATE;
+        super.init(homeButton, historyButton);
+        initChart();
 
     }
 
-    public void initChart(){
-        SortedTransactionList tl = SESSION.db.getCurrentUserTransactions();
+    private void initButtons(){
+        List<String> chartRangeOptions = new ArrayList<>();
+        for (Interval i: Interval.values()
+             ) {
+            chartRangeOptions.add(i.getText());
+
+        }
+        chartRangeComboBox.setItems(FXCollections.observableArrayList(chartRangeOptions));
+
+        List<String> comparisonOptions = new ArrayList<>();
+        for (ComparisonMethod c: ComparisonMethod.values()
+             ) {
+            comparisonOptions.add(c.getText());
+        }
+        historySortingComboBox.setItems(FXCollections.observableArrayList(comparisonOptions));
+
+        updateButton.setOnMouseClicked(
+            event -> {
+                String selectedInterval = chartRangeComboBox.getSelectionModel().getSelectedItem().toString();
+                if (selectedInterval.equals(Interval.MONTH.getText())) {
+                    historyChartInterval = Interval.MONTH;
+                }
+                else if (selectedInterval.equals(Interval.YEAR.getText())){
+                    historyChartInterval = Interval.YEAR;
+                }
+
+                String selectedComparison = historySortingComboBox.getSelectionModel().getSelectedItem().toString();
+
+                if(selectedComparison.equals(ComparisonMethod.DATE.getText())){
+                    historyComparisonMethod = ComparisonMethod.DATE;
+                }
+                else if(selectedComparison.equals(ComparisonMethod.CATEGORY.getText())){
+                    historyComparisonMethod = ComparisonMethod.CATEGORY;
+                }
+                else if(selectedComparison.equals(ComparisonMethod.VALUE.getText())){
+                    historyComparisonMethod = ComparisonMethod.VALUE;
+                }
+                onLoad();
+            }
+        );
+    }
+
+    private void initChart(){
+        SortedTransactionList tl = Session.getDb().getCurrentUserTransactions();
         historyChart.getData().clear();
-        historyChart.getData().add(tl.getPlotData(Interval.MONTH));
+        historyChart.getData().add(tl.getPlotData(historyChartInterval));
         xAxis.setLowerBound(1);
         xAxis.setUpperBound(Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH));
         xAxis.setTickUnit(1.0);
     }
 
-    public void setHistory(){
-        SortedTransactionList hist = SESSION.db.getCurrentUserTransactions();
+    private void setHistory(){
+        SortedTransactionList hist = Session.getDb().getCurrentUserTransactions().sort(historyComparisonMethod);
         recordsContainer.getChildren().clear();
         for (Transaction t : hist.list
              ) {
@@ -85,7 +134,7 @@ public class HistoryController extends Controller implements Initializable {
         }
     }
 
-    GridPane transactionPane (Transaction transaction){
+    private GridPane transactionPane(Transaction transaction){
         Label title = new Label();
         title.setText(transaction.getTitle());
         title.setFont(Font.font(18.0));
@@ -104,7 +153,7 @@ public class HistoryController extends Controller implements Initializable {
         category.setText(transaction.getCategory());
 
         Label id = new Label();
-        id.setText(new Integer(transaction.getId()).toString());
+        id.setText(Integer.toString(transaction.getId()));
 
         Button deleteButton = new Button("Delete");
 
@@ -131,7 +180,7 @@ public class HistoryController extends Controller implements Initializable {
                 Optional<Pair<String, String>> result = alert.showAndWait();
 
                 result.ifPresent(usernamePassword -> {
-                    SESSION.db.deleteTransaction(Integer.parseInt(id.getText()));
+                    Session.getDb().deleteTransaction(Integer.parseInt(id.getText()));
                     System.out.println("deleted transaction" + id.getText());
                     onLoad();
                 });
@@ -146,7 +195,7 @@ public class HistoryController extends Controller implements Initializable {
         else
             gridPane.setStyle("-fx-background-color: red;");
 
-        gridPane.setMargin(title, new Insets(10,0,10,0));
+        GridPane.setMargin(title, new Insets(10,0,10,0));
 
         gridPane.add(id, 0, 0);
         gridPane.add(title, 1, 0);
@@ -156,4 +205,7 @@ public class HistoryController extends Controller implements Initializable {
         gridPane.add(deleteButton, 2, 1);
         return gridPane;
     }
+
+
+
 }

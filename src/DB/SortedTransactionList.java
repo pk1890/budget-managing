@@ -1,14 +1,13 @@
 package DB;
 
-import Util.Interval;
-import javafx.collections.ObservableList;
+
 import javafx.scene.chart.XYChart;
 
 import java.time.LocalDate;
 import java.util.*;
 import java.sql.Date;
 
-public class SortedTransactionList implements Plottable {
+public class SortedTransactionList {
     public List<Transaction> list;
 
 
@@ -18,6 +17,28 @@ public class SortedTransactionList implements Plottable {
 
     public SortedTransactionList(){
         list = new ArrayList<Transaction>();
+    }
+
+    public SortedTransactionList copy (){
+        List <Transaction> list = new ArrayList<Transaction>(this.list);
+        return new SortedTransactionList(list);
+    }
+
+    public SortedTransactionList sort(ComparisonMethod cm){
+        SortedTransactionList copy = this.copy();
+        switch (cm){
+            case DATE:
+                copy.list.sort(Comparator.comparing(Transaction::getDate));
+                break;
+            case VALUE:
+                copy.list.sort(Comparator.comparing(Transaction::getValue));
+                break;
+            case CATEGORY:
+                copy.list.sort(Comparator.comparing(Transaction::getCategory));
+                break;
+
+        }
+        return copy;
     }
 
     public void add(Transaction tr){
@@ -75,13 +96,12 @@ public class SortedTransactionList implements Plottable {
         return this.getTransactionsFromDate(start).getTransactionsToDate(end);
     }
 
-    @Override
+
     public XYChart.Series getPlotData(Interval interval) {
         XYChart.Series result = new XYChart.Series();
         LocalDate now = LocalDate.now();
-
         switch (interval){
-            default:
+            case MONTH:
                 for(int i = 1; i <= now.getDayOfMonth(); i++){
 
                     Date date = new Date(
@@ -95,6 +115,19 @@ public class SortedTransactionList implements Plottable {
 
                     result.getData().add(new XYChart.Data(i, getTransactionsToDate(date).sum()));
                 }
+                break;
+            case YEAR:
+                for(int i =1; i <= now.getMonthValue(); i++){
+                    Calendar c = Calendar.getInstance();
+                    c.set(now.getYear(), now.getMonthValue(), 1);
+
+                    Date date = new Date(
+                        now.getYear(),
+                        i,
+                        c.getActualMaximum(Calendar.DAY_OF_MONTH)
+                    );
+                    result.getData().add(new XYChart.Data(i, getTransactionsToDate(date).sum()));
+                }
 
         }
         return result;
@@ -102,16 +135,38 @@ public class SortedTransactionList implements Plottable {
 
     public Map<String, Double> getCategoriesTrading(){
         Map<String, Double> res = new HashMap<>();
-        List<String> categories = SESSION.db.getCategoriesNames();
+        List<String> categories = Session.getDb().getCategoriesNames();
         for (String name : categories
              ) {
 
-            res.put(name, SESSION.db.getCurrentUserTransactionsByPredicate("categoryId = " + SESSION.db.getCategoryId(name)).absSum());
+            res.put(name, Session.getDb().getCurrentUserTransactionsByPredicate("categoryId = " + Session.getDb().getCategoryId(name)).absSum());
         }
         return res;
     }
 
 
+    public class valueComparator implements Comparator<Transaction>{
 
+        @Override
+        public int compare(Transaction o1, Transaction o2) {
+            return Float.compare(o1.getValue(), o2.getValue());
+        }
+    }
+
+    public class dateComparator implements Comparator<Transaction>{
+
+        @Override
+        public int compare(Transaction o1, Transaction o2) {
+            return o1.getDate().compareTo(o2.getDate());
+        }
+    }
+
+    public class categoryComparator implements  Comparator<Transaction>{
+
+        @Override
+        public int compare(Transaction o1, Transaction o2) {
+            return o1.getCategory().compareTo(o2.getCategory());
+        }
+    }
 
 }
