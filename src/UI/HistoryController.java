@@ -191,9 +191,9 @@ public class HistoryController extends Controller implements Initializable {
 
 
         if(transaction.getValue() > 0)
-            gridPane.setStyle("-fx-background-color: green;");
+            gridPane.setStyle("-fx-background-color: #6BFF64;");
         else
-            gridPane.setStyle("-fx-background-color: red;");
+            gridPane.setStyle("-fx-background-color: #FF8075;");
 
         GridPane.setMargin(title, new Insets(10,0,10,0));
 

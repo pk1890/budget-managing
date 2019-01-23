@@ -1,5 +1,6 @@
 package UI;
 
+import DB.AlreadyExistsException;
 import DB.Session;
 import DB.SortedTransactionList;
 import DB.Transaction;
@@ -95,9 +96,9 @@ public class MainController extends Controller implements Initializable{
                 ComboBox category = new ComboBox();
                 category.setPromptText("Set category");
 
-                category.getSelectionModel().selectFirst();
 
                 category.setItems(Session.getDb().getCategoriesNamesObservableList());
+                category.getSelectionModel().selectFirst();
 
 
 
@@ -132,7 +133,7 @@ public class MainController extends Controller implements Initializable{
 
                 result.ifPresent(usernamePassword -> {
 
-                    Session.getDb().addTransaction(new Transaction(
+                    try{Session.getDb().addTransaction(new Transaction(
                             0,
                             title.getText(),
                             Float.parseFloat(value.getText()),
@@ -143,6 +144,15 @@ public class MainController extends Controller implements Initializable{
                             Session.getLoggedUser().id
                         ));
                     updateCharts();
+                    }catch (NumberFormatException e){
+                        Dialog<Pair<String, String>> alert = new Dialog<>();
+                        alert.setTitle("Error");
+                        alert.setHeaderText("Wrong data");
+
+                        // Dodaj przyciski
+                        alert.getDialogPane().getButtonTypes().addAll(ButtonType.OK);
+                        alert.show();
+                    }
                 });
 
             }
@@ -153,7 +163,7 @@ public class MainController extends Controller implements Initializable{
             event -> {
                 // Stwórz popup'a
                 Dialog<Pair<String, String>> dialog = new Dialog<>();
-                dialog.setTitle("Add transaction");
+                dialog.setTitle("Add category");
                 dialog.setHeaderText("Adding new Category");
 
                 // Dodaj przyciski
@@ -185,9 +195,29 @@ public class MainController extends Controller implements Initializable{
                 Optional<Pair<String, String>> result = dialog.showAndWait();
 
                 result.ifPresent(usernamePassword -> {
+                    if(name.getText().isEmpty()){
+                        Dialog<Pair<String, String>> alert = new Dialog<>();
+                        alert.setTitle("Error");
+                        alert.setHeaderText("Wrong category name");
 
-                    Session.getDb().addCategory(name.getText());
+                        // Dodaj przyciski
+                        alert.getDialogPane().getButtonTypes().addAll(ButtonType.OK);
+                        alert.show();
+                    }
+                    else{
+                    try {
+                        Session.getDb().addCategory(name.getText());
+                    }catch (AlreadyExistsException e){
+                        Dialog<Pair<String, String>> alert = new Dialog<>();
+                        alert.setTitle("Error");
+                        alert.setHeaderText(e.getMessage());
+
+                        // Dodaj przyciski
+                        alert.getDialogPane().getButtonTypes().addAll(ButtonType.OK);
+                        alert.show();
+                    }
                     updateCharts();
+                    }
                 });
 
             }

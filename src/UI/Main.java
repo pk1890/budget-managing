@@ -22,14 +22,6 @@ public class Main extends Application {
 
         SortedTransactionList res = new SortedTransactionList();
         Session.init();
-
-        try {
-            Session.getDb().addUser("mlekoo", "mleko123");
-        } catch (AlreadyExistsException e) {
-            System.out.println("Już jest taki user");
-        }
-
-
         launch(args);
     }
 }

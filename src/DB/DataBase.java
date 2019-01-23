@@ -66,7 +66,12 @@ public class DataBase {
             stmt.execute(sqlCreateCat);
             stmt.execute(sqlCreateUsers);
             stmt.execute(sqlCreateTrans);
-            addCategory("other");
+            try {
+                addCategory("other");
+            }
+            catch (AlreadyExistsException e){
+                System.out.println("Omitting adding category other");
+            }
 
 
             System.out.println("The database was initialized successfully");
@@ -178,9 +183,13 @@ public class DataBase {
 
     }
 
-    public void addCategory(String categoryName){
+    public void addCategory(String categoryName) throws AlreadyExistsException{
         try (Connection conn = DriverManager.getConnection(url);
              Statement stmt = conn.createStatement()) {
+
+            List<String> names = getCategoriesNames();
+            if(names.contains(categoryName)) throw  new AlreadyExistsException("Category of this name already exists");
+
             ArrayList data = new ArrayList<Pair<String, String>>();
             data.add(new Pair<>("name", categoryName));
             String sql = SQLGenerator.Insert("Categories", data);

@@ -145,28 +145,6 @@ public class SortedTransactionList {
     }
 
 
-    public class valueComparator implements Comparator<Transaction>{
 
-        @Override
-        public int compare(Transaction o1, Transaction o2) {
-            return Float.compare(o1.getValue(), o2.getValue());
-        }
-    }
-
-    public class dateComparator implements Comparator<Transaction>{
-
-        @Override
-        public int compare(Transaction o1, Transaction o2) {
-            return o1.getDate().compareTo(o2.getDate());
-        }
-    }
-
-    public class categoryComparator implements  Comparator<Transaction>{
-
-        @Override
-        public int compare(Transaction o1, Transaction o2) {
-            return o1.getCategory().compareTo(o2.getCategory());
-        }
-    }
 
 }
